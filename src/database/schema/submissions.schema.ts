@@ -22,6 +22,9 @@ export class Submission {
   @Prop({ default: "" })
   assetLink: string;
 
+  @Prop({ required: true, type: Number })
+  dayCount: number;
+
   @Prop({ default: EAssetType.IMAGE, required: true, enum: EAssetType })
   assetType: EAssetType;
 
