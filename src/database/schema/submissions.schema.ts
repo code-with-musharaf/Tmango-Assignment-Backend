@@ -16,9 +16,6 @@ export class Submission {
   @Prop({ default: "" })
   description: string;
 
-  @Prop({ name: "totalChallengeDays", type: Number })
-  totalChallengeDays: number;
-
   @Prop({ default: "" })
   assetLink: string;
 

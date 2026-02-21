@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import { Challenge } from "src/database/schema/challenges.schema";
@@ -34,15 +38,42 @@ export class ChallengeService {
     return await challenge.save();
   }
 
-  async createSubmission(submission: Submission): Promise<Submission> {
+  async createSubmission(
+    id: string,
+    submission: Submission,
+    user: string,
+  ): Promise<Submission> {
     try {
       let assetLink = submission.assetLink;
       const type = submission.assetType;
+
+      const alreadySubmitted = await this.submissionsModel
+        .findOne({
+          challengeId: new mongoose.Types.ObjectId(id),
+          userId: new mongoose.Types.ObjectId(user),
+          dayCount: submission.dayCount,
+        })
+        .exec();
+
+      if (alreadySubmitted) {
+        throw new BadRequestException("You already submitted for this day");
+      }
+
+      // hdnling uploading asstet
       if (!assetLink.startsWith("http") && !assetLink.startsWith("https")) {
         assetLink = await this.s3Service.uploadBase64(assetLink, type);
       }
-      submission.assetLink = assetLink;
-      return await this.submissionsModel.create(submission);
+      if (!assetLink.startsWith("https")) {
+        throw new InternalServerErrorException(
+          "somehting went wrong while uploading asset",
+        );
+      }
+      return await this.submissionsModel.create({
+        ...submission,
+        challengeId: new mongoose.Types.ObjectId(id),
+        userId: new mongoose.Types.ObjectId(user),
+        assetLink,
+      });
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
