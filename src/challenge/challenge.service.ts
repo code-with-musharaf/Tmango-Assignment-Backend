@@ -96,7 +96,7 @@ export class ChallengeService {
     userId: string,
   ) {
     return this.submissionsModel
-      .findOne({
+      .find({
         challengeId: new mongoose.Types.ObjectId(challengeId),
         dayCount,
         userId: new mongoose.Types.ObjectId(userId),
