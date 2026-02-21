@@ -78,4 +78,28 @@ export class ChallengeService {
       throw new InternalServerErrorException(error.message);
     }
   }
+
+  async getSubmissionDetailsOfDay(
+    id: string,
+    dayCount: number,
+    userId: string,
+  ) {
+    return this.submissionsModel
+      .findOne({
+        challengeId: new mongoose.Types.ObjectId(id),
+        dayCount,
+        userId: new mongoose.Types.ObjectId(userId),
+      })
+      .exec();
+  }
+
+  async getAllSubmissionOfUser(userId: string, challengeId: string) {
+    return this.submissionsModel
+      .find({
+        userId: new mongoose.Types.ObjectId(userId),
+        challengeId: new mongoose.Types.ObjectId(challengeId),
+      })
+      .sort({ createdAt: -1 })
+      .exec();
+  }
 }

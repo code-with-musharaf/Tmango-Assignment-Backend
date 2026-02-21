@@ -38,4 +38,12 @@ export class ChallengeController {
   ): Promise<Submission> {
     return this.challengeService.createSubmission(id, submission, user);
   }
+
+  @Get("submission/:challengeId")
+  async getAllSubmissionOfUser(
+    @Param("challengeId") challengeId: string,
+    @CurrentUser() user: string,
+  ) {
+    return this.challengeService.getAllSubmissionOfUser(user, challengeId);
+  }
 }
