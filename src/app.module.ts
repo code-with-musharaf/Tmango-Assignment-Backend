@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { DatabaseModule } from './database/db.module';
-import { SessionModule } from './session/session.module';
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
+import { DatabaseModule } from "./database/db.module";
+import { ChallengeModule } from "./challenge/challenge.module";
 
 @Module({
   imports: [
@@ -12,7 +12,8 @@ import { SessionModule } from './session/session.module';
       isGlobal: true,
     }),
     DatabaseModule,
-    SessionModule,
+    AuthModule,
+    ChallengeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
