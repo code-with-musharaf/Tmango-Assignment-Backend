@@ -11,7 +11,7 @@ export class Challenge {
   @Prop({ default: "" })
   description: string;
 
-  @Prop({ name: "totalChallengeDays", type: Number })
+  @Prop({ name: "totalChallengeDays", type: Number, required: true })
   totalChallengeDays: number;
 
   @Prop({ default: [] })
