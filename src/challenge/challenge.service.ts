@@ -7,6 +7,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import { Challenge } from "src/database/schema/challenges.schema";
 import { Submission } from "src/database/schema/submissions.schema";
+import { User } from "src/database/schema/user.schema";
 import { S3Service } from "src/libs/uploadToS3Bucket.service";
 
 @Injectable()
@@ -29,12 +30,12 @@ export class ChallengeService {
     return this.challengeModel.findById(id).exec();
   }
 
-  async joinChallenge(id: string): Promise<Challenge> {
+  async joinChallenge(id: string, user): Promise<Challenge> {
     const challenge = await this.challengeModel.findById(id).exec();
     if (!challenge) {
       throw new Error("Challenge not found");
     }
-    challenge.joinedUsers.push(new mongoose.Types.ObjectId(id));
+    challenge.joinedUsers.push(user._id);
     return await challenge.save();
   }
 
@@ -46,6 +47,16 @@ export class ChallengeService {
     try {
       let assetLink = submission.assetLink;
       const type = submission.assetType;
+
+      const challenge = await this.challengeModel
+        .findOne({
+          _id: new mongoose.Types.ObjectId(id),
+          joinedUsers: new mongoose.Types.ObjectId(user),
+        })
+        .exec();
+      if (!challenge) {
+        throw new BadRequestException("You are not joined to this challenge");
+      }
 
       const alreadySubmitted = await this.submissionsModel
         .findOne({
@@ -101,5 +112,15 @@ export class ChallengeService {
       })
       .sort({ createdAt: -1 })
       .exec();
+  }
+
+  async checkUserJoinedChallenge(id: string, user: any): Promise<boolean> {
+    const challenge = await this.challengeModel
+      .findOne({
+        _id: new mongoose.Types.ObjectId(id),
+        joinedUsers: user._id,
+      })
+      .exec();
+    return !!challenge;
   }
 }

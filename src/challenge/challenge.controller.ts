@@ -26,8 +26,11 @@ export class ChallengeController {
   }
 
   @Post(":id/join")
-  async joinChallenge(@Param("id") id: string): Promise<Challenge> {
-    return this.challengeService.joinChallenge(id);
+  async joinChallenge(
+    @Param("id") id: string,
+    @CurrentUser() user: any,
+  ): Promise<Challenge> {
+    return this.challengeService.joinChallenge(id, user);
   }
 
   @Post("submission/:id")
@@ -45,5 +48,13 @@ export class ChallengeController {
     @CurrentUser() user: string,
   ) {
     return this.challengeService.getAllSubmissionOfUser(user, challengeId);
+  }
+
+  @Get("joined/:challengeId")
+  async checkUserJoinedChallenge(
+    @Param("challengeId") challengeId: string,
+    @CurrentUser() userId: string,
+  ) {
+    return this.challengeService.checkUserJoinedChallenge(challengeId, userId);
   }
 }
