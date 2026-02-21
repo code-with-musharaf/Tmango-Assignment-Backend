@@ -1,7 +1,8 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
+import { Injectable, BadRequestException, Global } from "@nestjs/common";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 
+@Global()
 @Injectable()
 export class S3Service {
   private s3: S3Client;
