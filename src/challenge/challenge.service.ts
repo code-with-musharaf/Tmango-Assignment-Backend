@@ -42,7 +42,7 @@ export class ChallengeService {
   async createSubmission(
     id: string,
     submission: Submission,
-    user: string,
+    user,
   ): Promise<Submission> {
     try {
       let assetLink = submission.assetLink;
@@ -51,7 +51,7 @@ export class ChallengeService {
       const challenge = await this.challengeModel
         .findOne({
           _id: new mongoose.Types.ObjectId(id),
-          joinedUsers: new mongoose.Types.ObjectId(user),
+          joinedUsers: new mongoose.Types.ObjectId(user?._id?.toString()),
         })
         .exec();
       if (!challenge) {
@@ -61,7 +61,7 @@ export class ChallengeService {
       const alreadySubmitted = await this.submissionsModel
         .findOne({
           challengeId: new mongoose.Types.ObjectId(id),
-          userId: new mongoose.Types.ObjectId(user),
+          userId: new mongoose.Types.ObjectId(user?._id?.toString()),
           dayCount: submission.dayCount,
         })
         .exec();
@@ -82,7 +82,7 @@ export class ChallengeService {
       return await this.submissionsModel.create({
         ...submission,
         challengeId: new mongoose.Types.ObjectId(id),
-        userId: new mongoose.Types.ObjectId(user),
+        userId: new mongoose.Types.ObjectId(user?._id?.toString()),
         assetLink,
       });
     } catch (error) {
@@ -91,13 +91,13 @@ export class ChallengeService {
   }
 
   async getSubmissionDetailsOfDay(
-    id: string,
+    challengeId: string,
     dayCount: number,
     userId: string,
   ) {
     return this.submissionsModel
       .findOne({
-        challengeId: new mongoose.Types.ObjectId(id),
+        challengeId: new mongoose.Types.ObjectId(challengeId),
         dayCount,
         userId: new mongoose.Types.ObjectId(userId),
       })

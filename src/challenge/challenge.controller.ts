@@ -57,4 +57,17 @@ export class ChallengeController {
   ) {
     return this.challengeService.checkUserJoinedChallenge(challengeId, userId);
   }
+
+  @Get("submission/:challengeId/:dayCount")
+  async getSubmissionDetailsOfDay(
+    @Param("challengeId") challengeId: string,
+    @Param("dayCount") dayCount: number,
+    @CurrentUser() user,
+  ) {
+    return this.challengeService.getSubmissionDetailsOfDay(
+      challengeId,
+      dayCount,
+      user._id!,
+    );
+  }
 }
