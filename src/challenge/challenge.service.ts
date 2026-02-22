@@ -71,7 +71,11 @@ export class ChallengeService {
       }
 
       // hdnling uploading asstet
-      if (!assetLink.startsWith("http") && !assetLink.startsWith("https")) {
+      if (
+        !!assetLink &&
+        !assetLink.startsWith("http") &&
+        !assetLink.startsWith("https")
+      ) {
         assetLink = await this.s3Service.uploadBase64(assetLink, type);
       }
       if (!assetLink.startsWith("https")) {
@@ -95,13 +99,44 @@ export class ChallengeService {
     dayCount: number,
     userId: string,
   ) {
-    return this.submissionsModel
-      .find({
-        challengeId: new mongoose.Types.ObjectId(challengeId),
-        dayCount,
-        userId: new mongoose.Types.ObjectId(userId),
-      })
-      .exec();
+    const submissons = await this.submissionsModel.aggregate([
+      {
+        $match: {
+          challengeId: new mongoose.Types.ObjectId(challengeId),
+          dayCount: Number(dayCount),
+          userId: new mongoose.Types.ObjectId(userId.toString()),
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          assetLink: 1,
+          dayCount: 1,
+          assetType: 1,
+          challengeId: 1,
+          userId: 1,
+          user: 1,
+        },
+      },
+    ]);
+    return {
+      success: true,
+      status: 200,
+      data: submissons,
+    };
   }
 
   async getAllSubmissionOfUser(userId: string, challengeId: string) {
