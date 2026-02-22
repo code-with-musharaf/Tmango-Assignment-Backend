@@ -22,7 +22,7 @@ export class Submission {
   @Prop({ required: true, type: Number })
   dayCount: number;
 
-  @Prop({ default: null, required: true, enum: EAssetType, nullable: true })
+  @Prop({ default: null, required: false, enum: EAssetType, nullable: true })
   assetType: EAssetType;
 
   @Prop({ default: "" })

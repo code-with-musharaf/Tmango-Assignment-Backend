@@ -78,7 +78,7 @@ export class ChallengeService {
       ) {
         assetLink = await this.s3Service.uploadBase64(assetLink, type);
       }
-      if (!assetLink.startsWith("https")) {
+      if (!!assetLink && !assetLink.startsWith("https")) {
         throw new InternalServerErrorException(
           "somehting went wrong while uploading asset",
         );
