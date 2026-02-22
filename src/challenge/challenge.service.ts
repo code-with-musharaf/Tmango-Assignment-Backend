@@ -99,12 +99,12 @@ export class ChallengeService {
     dayCount: number,
     userId: string,
   ) {
-    const submissons = await this.submissionsModel.aggregate([
+    let submissons = await this.submissionsModel.aggregate([
       {
         $match: {
           challengeId: new mongoose.Types.ObjectId(challengeId),
           dayCount: Number(dayCount),
-          userId: new mongoose.Types.ObjectId(userId.toString()),
+          // userId: new mongoose.Types.ObjectId(userId.toString()),
         },
       },
       {
@@ -129,13 +129,28 @@ export class ChallengeService {
           challengeId: 1,
           userId: 1,
           user: 1,
+          createdAt: 1,
         },
       },
     ]);
+    const userPost = submissons.find(
+      (submission) => submission.userId.toString() === userId.toString(),
+    );
+
+    if (userPost) {
+      submissons = [
+        userPost,
+        ...submissons.filter(
+          (submission) => submission.userId.toString() !== userId.toString(),
+        ),
+      ];
+    }
+
     return {
       success: true,
       status: 200,
       data: submissons,
+      userPost,
     };
   }
 
